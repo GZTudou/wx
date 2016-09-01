@@ -4,9 +4,32 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-public class WXUtil {
+import com.example.pojo.AccessToken;
+import com.google.gson.JsonObject;
+
+
+
+public class WeiXinUtil {
 	
 	private static final String TOKEN = "tudou";
+	private static final String APPID="wx6c0f9b6a44271e19";
+	private static final String APPSECRET="1dbd1f608b43d70f1d7711a29722c334";
+    private static final String TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET";
+    
+    /**
+     * 获取token票据
+     * @return
+     */
+    public static AccessToken getAccessToken(){
+    	AccessToken token = new AccessToken();
+    	String url = TOKEN_URL.replaceAll("APPID", APPID).replaceAll("APPSECRET", APPSECRET);
+    	JsonObject obj = HttpUtil.doGet(url);
+    	token.setAccess_token(obj.get("access_token").toString());
+    	token.setExpires_in(Integer.parseInt(obj.get("expires_in").toString()));
+    	Logger.log("获取TOKEN信息："+token);
+    	return token;
+    }
+    
 	
 	/**
 	 * 开发接口接入 服务器校验
@@ -22,7 +45,6 @@ public class WXUtil {
 		for (String string : params) {
 			sb.append(string);
 		}
-		System.out.println(getSHA(sb.toString())+":"+sb.toString());
 		if(signature.equals(getSHA(sb.toString())))
 			return true;
 		return false;
@@ -54,7 +76,7 @@ public class WXUtil {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        return null;
+        return "";
     }
     
 	
